@@ -34,7 +34,8 @@ typedef struct Map {
     /**
      * The internal pointer to the associated RaylibTilesonData.
      *
-     * This is referenced as a void* so that it can be used from C, even though it requires reference to a C++ class.
+     * This is referenced as a void* so that it can be used from C, even though it requires reference to a C++
+     * class.
      *
      * @see RaylibTilesonData
      */
@@ -50,7 +51,7 @@ typedef struct Map {
  *
  * @return The loaded Map data.
  */
-Map LoadTiledFromMemory(const unsigned char *fileData, int dataSize, const char* baseDir);
+Map LoadTiledFromMemory(const unsigned char* fileData, int dataSize, const char* baseDir);
 
 /**
  * Loads the given Tiled file.
@@ -90,4 +91,4 @@ void UnloadMap(Map map);
 }
 #endif
 
-#endif  // RAYLIB_TILESON_H_
+#endif // RAYLIB_TILESON_H_

@@ -1,20 +1,21 @@
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-#include "raylib.h"
 #include "raylib-tileson.h"
+#include "raylib.h"
 #include "tileson.hpp"
 
 // TODO: Add World support with LoadTiledWorld()
 
 class RaylibTilesonData {
-    public:
-        std::map<std::string, Texture> textures;
-        tson::Map* map;
+public:
+    std::map<std::string, Texture> textures;
+    tson::Map* map;
 };
 
-Color ColorFromTiledColor(tson::Colori color) {
+Color ColorFromTiledColor(tson::Colori color)
+{
     Color output;
     output.r = color.r;
     output.g = color.g;
@@ -23,7 +24,8 @@ Color ColorFromTiledColor(tson::Colori color) {
     return output;
 }
 
-Rectangle RectangleFromTiledRectangle(tson::Rect rect) {
+Rectangle RectangleFromTiledRectangle(tson::Rect rect)
+{
     Rectangle output;
     output.x = rect.x;
     output.y = rect.y;
@@ -32,7 +34,9 @@ Rectangle RectangleFromTiledRectangle(tson::Rect rect) {
     return output;
 }
 
-void LoadTiledImage(RaylibTilesonData* data, const char* baseDir, const std::string& imagepath, tson::Colori transparentColor) {
+void LoadTiledImage(
+    RaylibTilesonData* data, const char* baseDir, const std::string& imagepath, tson::Colori transparentColor)
+{
     // Only load the image if it's not yet loaded.
     if (data->textures.count(imagepath) == 0) {
         const char* image;
@@ -56,7 +60,8 @@ void LoadTiledImage(RaylibTilesonData* data, const char* baseDir, const std::str
     }
 }
 
-Map LoadTiledFromMemory(const unsigned char *fileData, int dataSize, const char* baseDir) {
+Map LoadTiledFromMemory(const unsigned char* fileData, int dataSize, const char* baseDir)
+{
     tson::Tileson t;
     auto map = t.parse(fileData, dataSize);
 
@@ -68,7 +73,7 @@ Map LoadTiledFromMemory(const unsigned char *fileData, int dataSize, const char*
     }
 
     // Check if it parsed okay.
-    if(map->getStatus() != tson::ParseStatus::OK) {
+    if (map->getStatus() != tson::ParseStatus::OK) {
         TraceLog(LOG_ERROR, "TILESON: Map parse error: %s", map->getStatusMessage().c_str());
         struct Map output;
         output.data = NULL;
@@ -108,7 +113,8 @@ Map LoadTiledFromMemory(const unsigned char *fileData, int dataSize, const char*
     return output;
 }
 
-Map LoadTiled(const char* fileName) {
+Map LoadTiled(const char* fileName)
+{
     unsigned int bytesRead;
     unsigned char* data = LoadFileData(fileName, &bytesRead);
     if (data == NULL || bytesRead == 0) {
@@ -123,14 +129,13 @@ Map LoadTiled(const char* fileName) {
     return map;
 }
 
-bool IsTiledReady(Map map) {
-    return map.data != NULL;
-}
+bool IsTiledReady(Map map) { return map.data != NULL; }
 
-void DrawTileLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint) {
+void DrawTileLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
+{
     for (const auto& [pos, tileObject] : layer.getTileObjects()) {
         tson::Tile* tile = tileObject.getTile();
-        tson::Tileset *tileset = tileObject.getTile()->getTileset();
+        tson::Tileset* tileset = tileObject.getTile()->getTileset();
         std::string image = tileset->getImage().string();
         if (data->textures.count(image) == 0) {
             continue;
@@ -139,12 +144,13 @@ void DrawTileLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int po
         Texture texture = data->textures[image];
         Rectangle drawRect = RectangleFromTiledRectangle(tileObject.getDrawingRect());
         tson::Vector2f position = tileObject.getPosition();
-        Vector2 drawPos = {position.x + posX, position.y + posY};
+        Vector2 drawPos = { position.x + posX, position.y + posY };
         DrawTextureRec(texture, drawRect, drawPos, tint);
     }
 }
 
-void DrawImageLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint) {
+void DrawImageLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
+{
     auto image = layer.getImage();
     if (data->textures.count(image) == 0) {
         return;
@@ -156,73 +162,77 @@ void DrawImageLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int p
     DrawTexture(texture, posX + offset.x, posY + offset.y, tint);
 }
 
-void DrawObjectLayer(tson::Layer &layer, RaylibTilesonData* data, int posX, int posY, Color tint) {
+void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
+{
 
-    //tson::Tileset* tileset = m_map->getTileset("demo-tileset");
-    auto *map = layer.getMap();
-    for(auto &obj : layer.getObjects()) {
-        switch(obj.getObjectType()) {
-            case tson::ObjectType::Text: {
-                if (obj.isVisible()) {
-                    auto textObj = obj.getText();
-                    const char* text = textObj.text.c_str();
-                    auto color = ColorFromTiledColor(textObj.color);
-                    auto pos = obj.getPosition();
+    // tson::Tileset* tileset = m_map->getTileset("demo-tileset");
+    auto* map = layer.getMap();
+    for (auto& obj : layer.getObjects()) {
+        switch (obj.getObjectType()) {
+        case tson::ObjectType::Text: {
+            if (obj.isVisible()) {
+                auto textObj = obj.getText();
+                const char* text = textObj.text.c_str();
+                auto color = ColorFromTiledColor(textObj.color);
+                auto pos = obj.getPosition();
 
-                    // TODO: Find the font size.
-                    DrawText(text, posX + pos.x, posY + pos.y, 16, color);
-                }
-            } break;
+                // TODO: Find the font size.
+                DrawText(text, posX + pos.x, posY + pos.y, 16, color);
+            }
+        } break;
 
-            default:
-                break;
+        default:
+            break;
         }
     }
 }
 
-void DrawLayer(tson::Layer &layer, RaylibTilesonData* data, int posX, int posY, Color tint) {
+void DrawLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
+{
     switch (layer.getType()) {
-        case tson::LayerType::TileLayer:
-            DrawTileLayer(layer, data, posX, posY, tint);
-            break;
+    case tson::LayerType::TileLayer:
+        DrawTileLayer(layer, data, posX, posY, tint);
+        break;
 
-        case tson::LayerType::ObjectGroup:
-            DrawObjectLayer(layer, data, posX, posY, tint);
-            break;
+    case tson::LayerType::ObjectGroup:
+        DrawObjectLayer(layer, data, posX, posY, tint);
+        break;
 
-        case tson::LayerType::ImageLayer:
-            DrawImageLayer(layer, data, posX, posY, tint);
-            break;
+    case tson::LayerType::ImageLayer:
+        DrawImageLayer(layer, data, posX, posY, tint);
+        break;
 
-        case tson::LayerType::Group:
-            for(auto &l : layer.getLayers()) {
-                DrawLayer(l, data, posX, posY, tint);
-            }
-            break;
+    case tson::LayerType::Group:
+        for (auto& l : layer.getLayers()) {
+            DrawLayer(l, data, posX, posY, tint);
+        }
+        break;
 
-        default:
-            TraceLog(LOG_TRACE, "TILESON: Unsupported layer type");
-            break;
+    default:
+        TraceLog(LOG_TRACE, "TILESON: Unsupported layer type");
+        break;
     }
 }
 
-void DrawTiled(Map map, int posX, int posY, Color tint) {
+void DrawTiled(Map map, int posX, int posY, Color tint)
+{
     RaylibTilesonData* data = (RaylibTilesonData*)map.data;
     if (data == NULL) {
         TraceLog(LOG_WARNING, "TILESON: Cannot draw empty map");
         return;
     }
     tson::Map* tsonMap = data->map;
-    auto &layers = tsonMap->getLayers();
+    auto& layers = tsonMap->getLayers();
 
     // TODO: Draw the background color.
 
-    for (auto &layer : layers) {
+    for (auto& layer : layers) {
         DrawLayer(layer, data, posX, posY, tint);
     }
 }
 
-void UnloadMap(Map map) {
+void UnloadMap(Map map)
+{
     RaylibTilesonData* data = (RaylibTilesonData*)map.data;
     if (data != NULL) {
         // Unload Tileson
