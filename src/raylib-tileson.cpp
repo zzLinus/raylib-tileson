@@ -168,6 +168,7 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
     // tson::Tileset* tileset = m_map->getTileset("demo-tileset");
     auto* map = layer.getMap();
     for (auto& obj : layer.getObjects()) {
+        std::cout << obj.getName() << "\n";
         switch (obj.getObjectType()) {
         case tson::ObjectType::Text: {
             if (obj.isVisible()) {
@@ -179,13 +180,22 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
                 // TODO: Find the font size.
                 DrawText(text, posX + pos.x, posY + pos.y, 16, color);
             }
-        } break;
-
+        }
+#ifdef DEBUG
+        case tson::ObjectType::Rectangle: {
+            tson::Rect rect
+                = tson::Rect(obj.getPosition().x, obj.getPosition().y, obj.getSize().x, obj.getSize().y);
+            Rectangle drawRect = RectangleFromTiledRectangle(rect);
+            DrawRectangleRec(drawRect, Color { 255, 255, 255, 100 });
+            break;
+        }
+#endif
         default:
             break;
         }
     }
 }
+// TODO: add collison detect function
 
 void DrawLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
 {
