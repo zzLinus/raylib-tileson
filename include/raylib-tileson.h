@@ -87,6 +87,15 @@ void DrawTiled(Map map, int posX, int posY, Color tint);
  */
 void UnloadMap(Map map);
 
+/**
+ * Check Collision
+ *
+ * @param map The map to draw.
+ * @param rect the collison rect to be juged.
+ * @return true for collision false for nothing
+ *
+ */
+bool CheckCollision(Map* map, Rectangle* rect);
 #ifdef __cplusplus
 }
 #endif

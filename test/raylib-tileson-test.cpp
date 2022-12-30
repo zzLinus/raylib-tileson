@@ -1,8 +1,9 @@
-#include "raylib.h"
-#include "raylib-tileson.h"
 #include "raylib-assert.h"
+#include "raylib-tileson.h"
+#include "raylib.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
     // Initialization
     SetTraceLogLevel(LOG_ALL);
     TraceLog(LOG_INFO, "================================");

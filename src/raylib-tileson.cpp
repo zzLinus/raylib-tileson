@@ -8,6 +8,8 @@
 
 // TODO: Add World support with LoadTiledWorld()
 
+using tson::Rect;
+
 class RaylibTilesonData {
 public:
     std::map<std::string, Texture> textures;
@@ -168,7 +170,6 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
     // tson::Tileset* tileset = m_map->getTileset("demo-tileset");
     auto* map = layer.getMap();
     for (auto& obj : layer.getObjects()) {
-        std::cout << obj.getName() << "\n";
         switch (obj.getObjectType()) {
         case tson::ObjectType::Text: {
             if (obj.isVisible()) {
@@ -182,13 +183,13 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
             }
         }
 #ifdef DEBUG
-        case tson::ObjectType::Rectangle: {
-            tson::Rect rect
-                = tson::Rect(obj.getPosition().x, obj.getPosition().y, obj.getSize().x, obj.getSize().y);
-            Rectangle drawRect = RectangleFromTiledRectangle(rect);
-            DrawRectangleRec(drawRect, Color { 255, 255, 255, 100 });
-            break;
-        }
+        // case tson::ObjectType::Rectangle: {
+        //     tson::Rect rect
+        //         = tson::Rect(obj.getPosition().x, obj.getPosition().y, obj.getSize().x, obj.getSize().y);
+        //     Rectangle drawRect = RectangleFromTiledRectangle(rect);
+        //     DrawRectangleRec(drawRect, Color { 255, 255, 255, 100 });
+        //     break;
+        // }
 #endif
         default:
             break;
@@ -196,6 +197,35 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
     }
 }
 // TODO: add collison detect function
+//
+bool CheckCollision(Map* map, Rectangle* rect)
+{
+    RaylibTilesonData* data = (RaylibTilesonData*)map->data;
+    tson::Map* tsonMap = data->map;
+    auto& layers = tsonMap->getLayers();
+    bool is_colli = false;
+    for (auto& layer : layers) {
+        if (layer.getType() == tson::LayerType::ObjectGroup) {
+            auto* map = layer.getMap();
+            for (auto& obj : layer.getObjects()) {
+                if (obj.getObjectType() == tson::ObjectType::Rectangle) {
+                    tson::Rect objRect
+                        = Rect(obj.getPosition().x, obj.getPosition().y, obj.getSize().x, obj.getSize().y);
+                    Rectangle worldRect = RectangleFromTiledRectangle(objRect);
+#ifdef DEBUG
+                    DrawRectangleRec(worldRect, Color { 255, 255, 255, 100 });
+                    DrawRectangleRec(*rect, Color { 0, 0, 255, 50 });
+#endif
+                    if (CheckCollisionRecs(worldRect, *rect))
+                        is_colli = true;
+                    // break;
+                }
+            }
+            // break;
+        }
+    }
+    return is_colli;
+}
 
 void DrawLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
 {
