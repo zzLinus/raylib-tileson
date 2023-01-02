@@ -95,7 +95,7 @@ void UnloadMap(Map map);
  * @return true for collision false for nothing
  *
  */
-bool CheckCollision(Map* map, Rectangle* rect);
+bool CheckCollision(Map* map, Rectangle* rect, bool debugState);
 #ifdef __cplusplus
 }
 #endif
