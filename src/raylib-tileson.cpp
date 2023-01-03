@@ -5,12 +5,17 @@
 #include "raylib-tileson.h"
 #include "raylib.h"
 #include "tileson.hpp"
+#include "utils.hpp"
 
 // TODO: Add World support with LoadTiledWorld()
 
 using tson::Rect;
 
-using tson::RaylibTilesonData;
+class RaylibTilesonData {
+public:
+    std::map<std::string, Texture> textures;
+    tson::Map* map;
+};
 
 Color ColorFromTiledColor(tson::Colori color)
 {
@@ -155,6 +160,10 @@ void DrawTileLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int po
 
 void DrawImageLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)
 {
+
+    NPatchInfo h3PatchInfo
+        = { (Rectangle) { 0.0f, 64.0f, 64.0f, 64.0f }, 8, 8, 8, 8, NPATCH_THREE_PATCH_HORIZONTAL };
+
     auto image = layer.getImage();
     if (data->textures.count(image) == 0) {
         return;
@@ -188,38 +197,6 @@ void DrawObjectLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int 
             break;
         }
     }
-}
-// TODO: add collison detect function
-//
-bool CheckCollision(Map* map, Rectangle* rect, bool debugState)
-{
-    RaylibTilesonData* data = (RaylibTilesonData*)map->data;
-    tson::Map* tsonMap = data->map;
-    auto& layers = tsonMap->getLayers();
-    bool is_colli = false;
-    for (auto& layer : layers) {
-        if (layer.getType() == tson::LayerType::ObjectGroup) {
-            for (auto& obj : layer.getObjects()) {
-                if (obj.getObjectType() == tson::ObjectType::Rectangle) {
-                    tson::Rect objRect
-                        = Rect(obj.getPosition().x, obj.getPosition().y, obj.getSize().x, obj.getSize().y);
-                    Rectangle worldRect = RectangleFromTiledRectangle(objRect);
-#ifdef DEBUG
-                    if (debugState == true) {
-                        DrawRectangleRec(worldRect, Color { 255, 255, 255, 100 });
-                        DrawRectangleLinesEx(*rect, 1, Color { 0, 0, 255, 20 });
-                    }
-#else
-                    if (CheckCollisionRecs(worldRect, *rect))
-                        is_colli = true;
-                    break;
-#endif
-                }
-            }
-            // break;
-        }
-    }
-    return is_colli;
 }
 
 void DrawLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, Color tint)

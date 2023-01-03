@@ -11,12 +11,14 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Register the cmake folder for find_package()
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # raylib-tileson
 add_subdirectory(src)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
 
 # Examples
 option(BUILD_RAYLIB_TILESON_EXAMPLE "Example" ON)
