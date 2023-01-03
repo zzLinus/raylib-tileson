@@ -10,11 +10,7 @@
 
 using tson::Rect;
 
-class RaylibTilesonData {
-public:
-    std::map<std::string, Texture> textures;
-    tson::Map* map;
-};
+using tson::RaylibTilesonData;
 
 Color ColorFromTiledColor(tson::Colori color)
 {
@@ -167,7 +163,6 @@ void DrawImageLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int p
     Texture texture = data->textures[image];
     auto offset = layer.getOffset();
 
-    std::cout << "draw layer : " << layer.getName() << "\n";
     DrawTexture(texture, posX + offset.x, posY + offset.y, tint);
 }
 
@@ -204,7 +199,6 @@ bool CheckCollision(Map* map, Rectangle* rect, bool debugState)
     bool is_colli = false;
     for (auto& layer : layers) {
         if (layer.getType() == tson::LayerType::ObjectGroup) {
-            auto* map = layer.getMap();
             for (auto& obj : layer.getObjects()) {
                 if (obj.getObjectType() == tson::ObjectType::Rectangle) {
                     tson::Rect objRect
@@ -213,13 +207,13 @@ bool CheckCollision(Map* map, Rectangle* rect, bool debugState)
 #ifdef DEBUG
                     if (debugState == true) {
                         DrawRectangleRec(worldRect, Color { 255, 255, 255, 100 });
-                        DrawRectangleLines(
-                            rect->x, rect->y, rect->width, rect->height, Color { 0, 0, 255, 20 });
+                        DrawRectangleLinesEx(*rect, 1, Color { 0, 0, 255, 20 });
                     }
-#endif
+#else
                     if (CheckCollisionRecs(worldRect, *rect))
                         is_colli = true;
-                    // break;
+                    break;
+#endif
                 }
             }
             // break;
@@ -244,9 +238,7 @@ void DrawLayer(tson::Layer& layer, RaylibTilesonData* data, int posX, int posY, 
         break;
 
     case tson::LayerType::Group:
-        std::cout << "draw group \n";
         for (auto& l : layer.getLayers()) {
-            std::cout << "draw layer " << l.getName() << " type : " << (int)l.getType() << "\n";
             DrawLayer(l, data, posX, posY, tint);
         }
         break;

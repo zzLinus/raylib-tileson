@@ -27,8 +27,7 @@
 /// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 /// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef TILESON_TILESON_H
-#define TILESON_TILESON_H
+#pragma once
 
 /*** Start of inlined file: json11.hpp ***/
 /*** Start of inlined file: json11.cpp ***/
@@ -60,6 +59,7 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <raylib.h>
 #include <string>
 #include <vector>
 
@@ -5974,6 +5974,12 @@ private:
     std::map<uint32_t, tson::Tile> m_flaggedTileMap; /*! key: Tile ID. Value: Tile*/
 };
 
+class RaylibTilesonData {
+public:
+    std::map<std::string, Texture> textures;
+    tson::Map* map;
+};
+
 /*!
  * A shortcut for getting a property. Alternative to getProperties().getValue<T>("<name>")
  * @tparam T The template value
@@ -6996,5 +7002,3 @@ int tson::World::loadMaps(tson::Tileson* parser)
 #endif // TILESON_TILESON_FORWARD_HPP
 
 /*** End of inlined file: tileson_forward.hpp ***/
-
-#endif // TILESON_TILESON_H
